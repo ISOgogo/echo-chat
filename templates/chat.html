@@ -2,34 +2,52 @@
 <html>
     <head>
         <title>Chat</title>
+        <style>
+            .message {
+                border: 2px solid #dedede;
+                background-color: #f1f1f1;
+                border-radius: 5px;
+                padding: 10px;
+                margin: 10px 0;
+            }
+            .chatbox {
+                width: 300px;
+                height: 320px;
+                overflow: auto;
+            }
+        </style>
     </head>
     <body>
-        <h1>WebSocket Chat</h1>
+        <h1>Echo Echo Chat</h1>
+        <h2 id="username" style="display: none;">{{username}}</h2>
 
+        <ul id='messages' class="chatbox"></ul>
         <form action="" onsubmit="sendMessage(event)" id="form">
-            <input type="text" id="messageText" autocomplete="off"/>
+            <label for="messageText">{{username}}: </label>
+            <input type="text" id="messageText" autocomplete="off" required/>
             <button>Send</button>
         </form>
-        <ul id='messages'>
-        </ul>
-        <h2 id="username">{{username}}</h2>
+        
         <script>
-            
+        
             var username = document.getElementById("username").innerText;            
             var socket = new WebSocket(`ws://localhost:8000/ws/${username}`);
 
             function processMessage(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
+                var messages = document.getElementById('messages');
+                var message = document.createElement('li');
+                message.className = "message";
+                var content = document.createTextNode(event.data);
                 message.appendChild(content);
                 messages.appendChild(message);
+                document.getElementById('messages').scrollTop = message.offsetHeight + message.offsetTop; 
+           
             }
 
             socket.onmessage = processMessage;
             
-            function sendMessage(event) {               
-                var input = document.getElementById("messageText")
+            function sendMessage(event) {       
+                var input = document.getElementById("messageText");
                 socket.send(input.value);
                 input.value = ''
                 event.preventDefault()  //post request yollamasını engeller
